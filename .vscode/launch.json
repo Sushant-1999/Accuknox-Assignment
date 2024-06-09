@@ -1,0 +1,13 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "C/C++ Runner: Debug Session",
+      "type": "lldb",
+      "request": "launch",
+      "args": [],
+      "cwd": "/Users/sushantagawane/Documents/projects/Accuknox-Assignment",
+      "program": "/Users/sushantagawane/Documents/projects/Accuknox-Assignment/build/Debug/outDebug"
+    }
+  ]
+}

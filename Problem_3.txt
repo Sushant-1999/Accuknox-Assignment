@@ -1,0 +1,90 @@
+Problem Statement 3: Explain the code snippet
+
+Explain what the following code is attempting to do? You can explain by:
+Explaining how the highlighted constructs work?
+Giving use-cases of what these constructs could be used for.
+What is the significance of the for loop with 4 iterations?
+What is the significance of make(chan func(), 10)?
+Why is “HERE1” not getting printed?
+
+package main
+
+import "fmt"
+
+func main() {
+    cnp := make(chan func(), 10)
+    for i := 0; i < 4; i++ {
+        go func() {
+            for f := range cnp {
+                f()
+            }
+        }()
+    }
+    cnp <- func() {
+        fmt.Println("HERE1")
+    }
+    fmt.Println("Hello")
+}
+
+-------------------------------------Answer-------------------------------------
+
+
+
+Problem Statement 3 : Solution 
+
+How the Constructs Work:
+
+Channels: A channel in Go is a conduit through which goroutines communicate. Channels can be buffered (like in this case) or unbuffered.
+
+Goroutines: Lightweight threads managed by the Go runtime. The go func() { ... }() syntax starts a new goroutine.
+Range over Channel: for f := range cnp continuously receives from the channel until it is closed.
+
+Use-Cases:
+
+Channels: Useful for synchronizing and communicating between goroutines. Buffered channels allow sending without immediate receiving, useful for decoupling the sender and receiver.
+Goroutines: Used for concurrent execution. Ideal for tasks like web servers, background processing, or any I/O operations that can be parallelized.
+
+Range over Channel: Often used to process a stream of data until the channel is closed.
+Significance of the For Loop with 4 Iterations:
+It starts 4 goroutines that are ready to process functions from the cnp channel concurrently. This increases the potential concurrency, allowing up to 4 functions to be processed in parallel.
+
+Significance of make(chan func(), 10):
+The buffered channel can hold up to 10 function values. This allows sending up to 10 functions to the channel without blocking if there are no goroutines available to receive immediately.
+
+Why "HERE1" is not Getting Printed?:
+"HERE1" is not printed because the program terminates before the goroutines have a chance to execute the function received from the channel. The main function finishes execution right after printing "Hello" and does not wait for the goroutines to process the function.
+
+To ensure "HERE1" gets printed, you would need to add synchronization, such as using a sync.WaitGroup to wait for the goroutines to complete their work before the main function exits.
+Solution to Ensure "HERE1" Gets Printed
+You can modify the code to use a sync.WaitGroup to wait for the goroutine to finish processing:
+
+package main
+
+import (
+    "fmt"
+    "sync"
+)
+
+func main() {
+    cnp := make(chan func(), 10)
+    var wg sync.WaitGroup
+    wg.Add(1)
+    
+    for i := 0; i < 4; i++ {
+        go func() {
+            for f := range cnp {
+                f()
+                wg.Done() // Decrement the WaitGroup counter when a function is processed
+            }
+        }()
+    }
+    
+    cnp <- func() {
+        fmt.Println("HERE1")
+    }
+    wg.Wait() // Wait for all functions to be processed
+    fmt.Println("Hello")
+}
+
+In this version, wg.Add(1) is called before sending the function to the channel, and wg.Done() is called after the function is executed. This ensures the main function waits until "HERE1" is printed before printing "Hello" and exiting.
+

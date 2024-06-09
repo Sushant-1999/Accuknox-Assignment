@@ -1,0 +1,15 @@
+Problem Statement 1: Drop TCP Packets on a Specific Port
+Step 1: Install Dependencies
+
+Make sure you have the necessary tools and libraries installed on your system. You'll need bcc (BPF Compiler Collection) and bpftool. On a Debian-based system, you can install them with:
+
+
+sudo apt-get install bpfcc-tools linux-headers-$(uname -r)
+sudo apt-get install bpftool
+
+go build -o drop_tcp main.go
+sudo ./drop_tcp 4040
+
+
+go build -o drop_process main1.go
+sudo ./drop_process myprocess 4040
